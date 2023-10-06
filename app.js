@@ -6,8 +6,6 @@ const routes = require("./routes/index")
 const rateLimit = require("express-rate-limit") // Basic rate-limiting middleware for Express. Use to limit repeated requests to public APIs and/or endpoints such as password reset.
 const helmet = require("helmet") // Helmet helps you secure your Express apps by setting various HTTP headers. It's not a silver bullet, but it can help!
 
-
-
 const mongosanitize = require("express-mongo-sanitize") // This module searches for any keys in objects that begin with a $ sign or contain a ., from req.body, req.query or req.params.
 
 // By default, $ and . characters are removed completely from user-supplied input in the following places:
@@ -26,13 +24,19 @@ const session = require("cookie-session") // Simple cookie-based session middlew
 
 const app = express()
 
+const allowedOrigins = ["http://localhost:5173", "https://chat-app-lake-six.vercel.app"]
+
 app.use(
   cors({
-    origin: "*",
-
-    methods: ["GET", "PATCH", "POST", "DELETE", "PUT"],
-
-    credentials: true, //
+    origin: (origin, callback) => {
+      if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+        callback(null, true)
+      } else {
+        callback(new Error("Not allowed by CORS"))
+      }
+    },
+    credentials: true,
+    optionsSuccessStatus: 200,
   })
 )
 
