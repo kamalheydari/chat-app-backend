@@ -42,7 +42,7 @@ const app = express()
 
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN,
+    origin: '*',
 
     methods: ["GET", "PATCH", "POST", "DELETE", "PUT"],
 
