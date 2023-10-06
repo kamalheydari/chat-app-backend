@@ -1,6 +1,8 @@
 const mongoose = require("mongoose")
 const { Server } = require("socket.io")
+const dotenv = require("dotenv")
 
+dotenv.config({ path: "./config.env" })
 
 process.on("uncaughtException", (err) => {
   console.log(err)

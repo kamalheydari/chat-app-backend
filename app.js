@@ -94,5 +94,6 @@ app.use(
 app.use(mongosanitize())
 
 app.use(routes)
+app.get("/", (req, res) => res.json("hello"))
 
 module.exports = app
