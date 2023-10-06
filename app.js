@@ -24,21 +24,21 @@ const session = require("cookie-session") // Simple cookie-based session middlew
 
 const app = express()
 
-const allowedOrigins = ["http://localhost:5173", "https://chat-app-lake-six.vercel.app"]
+// const allowedOrigins = ["http://localhost:5173", "https://chat-app-lake-six.vercel.app"]
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-        callback(null, true)
-      } else {
-        callback(new Error("Not allowed by CORS"))
-      }
-    },
-    credentials: true,
-    optionsSuccessStatus: 200,
-  })
-)
+// app.use(
+//   cors({
+//     origin: (origin, callback) => {
+//       if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+//         callback(null, true)
+//       } else {
+//         callback(new Error("Not allowed by CORS"))
+//       }
+//     },
+//     credentials: true,
+//     optionsSuccessStatus: 200,
+//   })
+// )
 
 app.use(cookieParser())
 
