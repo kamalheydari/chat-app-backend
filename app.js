@@ -1,5 +1,4 @@
 const express = require("express") // web framework for Node.js.
-const morgan = require("morgan") // HTTP request logger middleware for node.js
 
 const routes = require("./routes/index")
 
@@ -47,9 +46,6 @@ app.use(
 
 app.use(helmet())
 
-if (process.env.NODE_ENV === "development") {
-  app.use(morgan("dev"))
-}
 
 const limiter = rateLimit({
   max: 3000,
