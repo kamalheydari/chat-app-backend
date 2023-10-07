@@ -24,7 +24,8 @@ const session = require("cookie-session") // Simple cookie-based session middlew
 
 const app = express()
 
-app.use(
+app.options(
+  "*",
   cors({
     origin: "https://chat-app-lake-six.vercel.app",
     credentials: true,
