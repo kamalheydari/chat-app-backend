@@ -3,6 +3,7 @@ const filterObj = require("../utils/filterObj")
 const User = require("../models/userModel")
 const { promisify } = require("util")
 const catchAsync = require("../utils/catchAsync")
+const allowCors = require("../utils/allowCors")
 
 const signToken = (userId) =>
   jwt.sign({ userId }, process.env.JWT_SECRET, {
@@ -21,110 +22,116 @@ const tokenCookieOptions = {
 //@description     Register new user
 //@route           POST /auth/register
 //@access          Public
-exports.register = catchAsync(async (req, res, next) => {
-  try {
-    const { email } = req.body
+exports.register = catchAsync(
+  allowCors(async (req, res, next) => {
+    try {
+      const { email } = req.body
 
-    const filteredBody = filterObj(req.body, "firstName", "lastName", "email", "password")
+      const filteredBody = filterObj(req.body, "firstName", "lastName", "email", "password")
 
-    // check if a verified user with given email exists
-    const existing_user = await User.findOne({ email: email })
+      // check if a verified user with given email exists
+      const existing_user = await User.findOne({ email: email })
 
-    if (existing_user) {
-      // user with this email already exists, Please login
-      return res.status(400).json({
+      if (existing_user) {
+        // user with this email already exists, Please login
+        return res.status(400).json({
+          status: "error",
+          message: "Email already in use, Please login.",
+        })
+      } else {
+        // if user is not created before than create a new one
+        const new_user = await User.create(filteredBody)
+
+        req.userId = new_user._id
+
+        const token = signToken(new_user._id)
+
+        res.cookie("token", token, tokenCookieOptions)
+        res.cookie("logged_in", true, {
+          ...tokenCookieOptions,
+          httpOnly: false,
+        })
+
+        res.status(201).json({
+          status: "success",
+          message: "User created successfully.",
+        })
+      }
+    } catch (error) {
+      res.status(500).json({
         status: "error",
-        message: "Email already in use, Please login.",
-      })
-    } else {
-      // if user is not created before than create a new one
-      const new_user = await User.create(filteredBody)
-
-      req.userId = new_user._id
-
-      const token = signToken(new_user._id)
-
-      res.cookie("token", token, tokenCookieOptions)
-      res.cookie("logged_in", true, {
-        ...tokenCookieOptions,
-        httpOnly: false,
-      })
-
-      res.status(201).json({
-        status: "success",
-        message: "User created successfully.",
+        message: error.message,
       })
     }
-  } catch (error) {
-    res.status(500).json({
-      status: "error",
-      message: error.message,
-    })
-  }
-})
+  })
+)
 
 //@description     Auth the user
 //@route           POST /auth/login
 //@access          Public
-exports.login = catchAsync(async (req, res, next) => {
-  const { email, password } = req.body
+exports.login = catchAsync(
+  allowCors(async (req, res, next) => {
+    const { email, password } = req.body
 
-  if (!email || !password) {
-    res.status(400).json({
-      status: "error",
-      message: "Both email and password are required",
+    if (!email || !password) {
+      res.status(400).json({
+        status: "error",
+        message: "Both email and password are required",
+      })
+      return
+    }
+
+    const user = await User.findOne({ email: email }).select("+password")
+
+    if (!user || !user.password) {
+      res.status(400).json({
+        status: "error",
+        message: "Incorrect password",
+      })
+
+      return
+    }
+
+    if (!user) {
+      res.status(400).json({
+        status: "error",
+        message: "Email or password is incorrect",
+      })
+
+      return
+    }
+
+    req.userId = user._id
+
+    const token = signToken(user._id)
+
+    res.cookie("token", token, tokenCookieOptions)
+    res.cookie("logged_in", true, {
+      ...tokenCookieOptions,
+      httpOnly: false,
     })
-    return
-  }
 
-  const user = await User.findOne({ email: email }).select("+password")
-
-  if (!user || !user.password) {
-    res.status(400).json({
-      status: "error",
-      message: "Incorrect password",
+    res.status(200).json({
+      status: "success",
+      message: "Logged in successfully!",
     })
-
-    return
-  }
-
-  if (!user) {
-    res.status(400).json({
-      status: "error",
-      message: "Email or password is incorrect",
-    })
-
-    return
-  }
-
-  req.userId = user._id
-
-  const token = signToken(user._id)
-
-  res.cookie("token", token, tokenCookieOptions)
-  res.cookie("logged_in", true, {
-    ...tokenCookieOptions,
-    httpOnly: false,
   })
-
-  res.status(200).json({
-    status: "success",
-    message: "Logged in successfully!",
-  })
-})
+)
 
 //@description     Logout the user
 //@route           GET /auth/login
 //@access          Public
-exports.logout = catchAsync(async (req, res, next) => {
-  res.cookie("token", "", { maxAge: 1 })
-  res.cookie("logged_in", "", { maxAge: 1 })
+exports.logout = catchAsync(
+  allowCors(async (req, res, next) => {
+    res.cookie("token", "", { maxAge: 1 })
+    res.cookie("logged_in", "", { maxAge: 1 })
 
-  res.status(200).json({
-    status: "success",
-    message: "Logout is successfully!",
+    res.status(200).json({
+      status: "success",
+      message: "Logout is successfully!",
+    })
   })
-})
+)
 
 // Protect
 exports.protect = catchAsync(async (req, res, next) => {

@@ -18,27 +18,10 @@ const bodyParser = require("body-parser") // Node.js body parsing middleware.
 
 // Parses incoming request bodies in a middleware before your handlers, available under the req.body property.
 
-const cors = require("cors") // CORS is a node.js package for providing a Connect/Express middleware that can be used to enable CORS with various options.
 const cookieParser = require("cookie-parser") // Parse Cookie header and populate req.cookies with an object keyed by the cookie names.
 const session = require("cookie-session") // Simple cookie-based session middleware.
 
 const app = express()
-
-// const allowedOrigins = ["http://localhost:5173", "https://chat-app-lake-six.vercel.app"]
-
-// app.use(
-//   cors({
-//     origin: (origin, callback) => {
-//       if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-//         callback(null, true)
-//       } else {
-//         callback(new Error("Not allowed by CORS"))
-//       }
-//     },
-//     credentials: true,
-//     optionsSuccessStatus: 200,
-//   })
-// )
 
 app.use(cookieParser())
 
