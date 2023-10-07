@@ -8,11 +8,6 @@ const helmet = require("helmet") // Helmet helps you secure your Express apps by
 
 const mongosanitize = require("express-mongo-sanitize") // This module searches for any keys in objects that begin with a $ sign or contain a ., from req.body, req.query or req.params.
 
-// By default, $ and . characters are removed completely from user-supplied input in the following places:
-// - req.body
-// - req.params
-// - req.headers
-// - req.query
 
 const bodyParser = require("body-parser") // Node.js body parsing middleware.
 
