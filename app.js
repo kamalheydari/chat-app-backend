@@ -11,19 +11,11 @@ const bodyParser = require("body-parser") // Node.js body parsing middleware.
 
 // Parses incoming request bodies in a middleware before your handlers, available under the req.body property.
 
-const cors = require("cors") // CORS is a node.js package for providing a Connect/Express middleware that can be used to enable CORS with various options.
 const cookieParser = require("cookie-parser") // Parse Cookie header and populate req.cookies with an object keyed by the cookie names.
 const session = require("cookie-session") // Simple cookie-based session middleware.
 
 const app = express()
 
-app.use(
-  cors({
-    origin: [process.env.CLIENT_ORIGIN],
-    credentials: true,
-    methods: ["POST", "GET", "PATCH", "PUT", "DELETE"],
-  })
-)
 
 app.use(cookieParser())
 
