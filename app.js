@@ -7,7 +7,6 @@ const helmet = require("helmet") // Helmet helps you secure your Express apps by
 
 const mongosanitize = require("express-mongo-sanitize") // This module searches for any keys in objects that begin with a $ sign or contain a ., from req.body, req.query or req.params.
 
-
 const bodyParser = require("body-parser") // Node.js body parsing middleware.
 
 // Parses incoming request bodies in a middleware before your handlers, available under the req.body property.
@@ -20,8 +19,9 @@ const app = express()
 
 app.use(
   cors({
-    origin: `${process.env.CLIENT_ORIGIN}`,
+    origin: [process.env.CLIENT_ORIGIN],
     credentials: true,
+    methods: ["POST", "GET", "PATCH", "PUT", "DELETE"],
   })
 )
 
@@ -45,7 +45,6 @@ app.use(
 )
 
 app.use(helmet())
-
 
 const limiter = rateLimit({
   max: 3000,
